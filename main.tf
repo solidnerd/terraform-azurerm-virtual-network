@@ -29,16 +29,10 @@ locals {
     }
   ]
 
-  subnet_ids = { for s in azurerm_subnet.main : s.name => s.id }
+    subnet_ids = { for s in azurerm_subnet.main : s.name => s.id }
 
   network_security_group_ids = {
-    for s in local.subnets : s.name =>
-    s.network_security_group_id if s.network_security_group_id != ""
-  }
-
-  route_table_ids = {
-    for s in local.subnets : s.name =>
-    s.route_table_id if s.route_table_id != ""
+    for s in local.subnets : s.name => s.network_security_group_id if s.network_security_group_id != ""
   }
 
   network_security_group_associations = [
@@ -47,6 +41,10 @@ locals {
       network_security_group_id = id
     }
   ]
+
+  route_table_ids = {
+    for s in local.subnets : s.name => s.route_table_id if s.route_table_id != ""
+  }
 
   route_table_associations = [
     for subnet, id in local.route_table_ids : {
